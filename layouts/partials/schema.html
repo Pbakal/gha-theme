@@ -1,0 +1,118 @@
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    
+    {{/* 1. ORGANIZZAZIONE (Identità del sito) */}}
+    {
+      "@type": "{{ .Site.Params.siteType | default "Organization" }}",
+      "@id": "{{ .Site.BaseURL }}#organization",
+      "name": "{{ .Site.Title }}",
+      "url": "{{ .Site.BaseURL }}",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "{{ .Site.BaseURL }}{{ .Site.Params.logo }}"
+      },
+      "description": "{{ .Site.Params.description }}",
+      
+      {{/* IL CUORE DELLA LOCALIZZAZIONE */}}
+      "areaServed": {
+        "@type": "City",
+        "name": "{{ .Site.Params.city }}",
+        "containedInPlace": {
+            "@type": "AdministrativeArea",
+            "name": "{{ .Site.Params.region }}"
+        }
+      },
+      {{/* --- INIZIO NUOVO CODICE: COLLEGAMENTO AL GENITORE --- */}}
+      {{ if .Site.Params.parentOrg }}
+      "parentOrganization": {
+          "@type": "NewsMediaOrganization",
+          "name": "{{ .Site.Params.parentOrg.name }}",
+          "url": "{{ .Site.Params.parentOrg.url }}",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "{{ .Site.Params.parentOrg.logo }}"
+          }
+      },
+      {{ end }}
+      {{/* --- FINE NUOVO CODICE --- */}}
+      "location": {
+        "@type": "Place",
+        "name": "{{ .Site.Params.city }}",
+        "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": "{{ .Site.Params.latitude }}",
+            "longitude": "{{ .Site.Params.longitude }}"
+        }
+      },
+      "sameAs": [
+        "{{ .Site.Params.facebook }}",
+        "{{ .Site.Params.twitter }}"
+      ]
+    }
+
+    {{/* 2. SITO WEB (Collegamento logico) */}}
+    ,{
+      "@type": "WebSite",
+      "@id": "{{ .Site.BaseURL }}#website",
+      "url": "{{ .Site.BaseURL }}",
+      "name": "{{ .Site.Title }}",
+      "publisher": {
+        "@id": "{{ .Site.BaseURL }}#organization"
+      },
+      "inLanguage": "{{ .Site.LanguageCode }}"
+    }
+
+    {{/* 3. ARTICOLO (Solo se siamo in una pagina singola) */}}
+    {{ if .IsPage }}
+    ,{
+      "@type": "NewsArticle",
+      "@id": "{{ .Permalink }}#article",
+      "isPartOf": {
+        "@id": "{{ .Site.BaseURL }}#website"
+      },
+      "headline": "{{ .Title }}",
+      "description": "{{ .Summary | plainify }}",
+      "datePublished": "{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}",
+      "dateModified": "{{ .Lastmod.Format "2006-01-02T15:04:05Z07:00" }}",
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "{{ .Permalink }}"
+      },
+      
+      {{/* Recupero Immagine (usiamo la stessa logica del tema) */}}
+      {{ $img := .Resources.GetMatch "*{jpg,png,webp}" }}
+      {{ if $img }}
+      "image": {
+        "@type": "ImageObject",
+        "url": "{{ $img.Permalink }}",
+        "width": {{ $img.Width }},
+        "height": {{ $img.Height }}
+      },
+      {{ end }}
+
+      "author": {
+        "@type": "Person",
+        "name": "{{ .Params.author | default .Site.Title }}"
+      },
+      "publisher": {
+        "@id": "{{ .Site.BaseURL }}#organization"
+      },
+
+      {{/* GEOLOCALIZZAZIONE DELL'ARTICOLO */}}
+      {{/* Se l'articolo parla di un luogo specifico, lo eredita dal sito o può essere sovrascritto nel frontmatter */}}
+      "contentLocation": {
+        "@type": "Place",
+        "name": "{{ .Params.location | default .Site.Params.city }}",
+        "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "{{ .Params.location | default .Site.Params.city }}",
+            "addressCountry": "{{ .Site.Params.country }}"
+        }
+      }
+    }
+    {{ end }}
+  ]
+}
+</script>
