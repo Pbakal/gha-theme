@@ -1,3 +1,110 @@
-<nav>
-  <a href="/">Home</a>
+<nav x-data="{ isOpen: false }" @resize.window="if (window.innerWidth > 768) isOpen = false"
+     class="fixed top-0 left-0 w-full z-50 transition-all duration-300 md:bg-white/90 md:backdrop-blur-md md:border-b md:border-gray-200 md:shadow-sm">
+  
+  <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between relative bg-transparent z-50">
+    
+    <a href="/" class="text-2xl font-black tracking-tighter uppercase transition-colors duration-300
+        {{ if .IsHome }} text-white drop-shadow-md {{ else }} text-brand {{ end }}
+        md:text-brand md:drop-shadow-none">
+      
+      {{ .Site.Params.city }}
+      <span class="{{ if .IsHome }} text-brand {{ else }} text-text-main {{ end }} md:text-text-main">
+        today
+      </span>
+    </a>
+
+    <div class="hidden md:flex gap-6 text-sm font-bold uppercase tracking-wide text-text-main">
+      {{ range .Site.Menus.main }}
+        <a href="{{ .URL }}" class="hover:text-brand transition-colors">{{ .Name }}</a>
+      {{ end }}
+    </div>
+
+    <button @click="isOpen = !isOpen" 
+            class="md:hidden cursor-pointer {{ if .IsHome }} text-white drop-shadow-md {{ else }} text-text-main {{ end }} focus:outline-none"
+            aria-label="Toggle Menu">
+      <svg x-show="!isOpen" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-8">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+      </svg>
+      <svg x-show="isOpen" style="display: none;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-8 text-white"> <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+
+  <div x-show="isOpen" 
+       x-transition:enter="transition ease-out duration-300"
+       x-transition:enter-start="-translate-x-full"
+       x-transition:enter-end="translate-x-0"
+       x-transition:leave="transition ease-in duration-200"
+       x-transition:leave-start="translate-x-0"
+       x-transition:leave-end="-translate-x-full"
+       class="md:hidden  fixed inset-0 z-40 bg-[#0f0f0f] text-white flex flex-col h-screen w-full overflow-y-auto pt-20"
+       style="display: none;">
+
+      <div class="px-4 pb-4 border-b border-gray-800 flex justify-between items-center">
+          <span class="text-xl font-black tracking-tighter uppercase text-white">MENU</span>
+      </div>
+
+      <div class="p-4 bg-[#0f0f0f]">
+          <div class="relative">
+              <input type="text" placeholder="Search the site" 
+                     class="w-full bg-white text-gray-900 px-4 py-3 pr-10 rounded-sm focus:outline-none focus:ring-2 focus:ring-brand font-sans">
+              <button class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-900">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                  </svg>
+              </button>
+          </div>
+      </div>
+
+      <div class="flex-1">
+          {{ range .Site.Menus.mobile }}
+              
+              <div x-data="{ expanded: {{ if eq .Identifier "news" }}true{{ else }}false{{ end }} }" 
+                   class="border-b border-gray-800">
+
+                  <button @click="expanded = !expanded" 
+                          class="w-full flex items-center justify-between p-4 text-left hover:bg-gray-900 transition-colors relative z-10 bg-[#0f0f0f]">
+                      
+                      <div x-show="expanded" class="absolute left-0 top-0 bottom-0 w-1 bg-brand"></div>
+                      
+                      <span class="text-xl font-bold font-serif tracking-wide" :class="expanded ? 'text-white' : 'text-gray-200'">
+                          {{ .Name }}
+                      </span>
+                      
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" 
+                           class="size-5 text-gray-400 transition-transform duration-300"
+                           :class="expanded ? 'rotate-180' : ''">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                      </svg>
+                  </button>
+
+                  <div class="grid transition-[grid-template-rows] duration-300 ease-out"
+                       :class="expanded ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'">
+                      <div class="overflow-hidden">
+                          <div class="bg-[#0f0f0f] px-4 pb-6 pt-2">
+                              
+                              {{ if .HasChildren }}
+                                  <div class="grid grid-cols-2 gap-y-4 gap-x-4">
+                                      {{ range .Children }}
+                                          <a href="{{ .URL }}" class="text-gray-300 hover:text-brand hover:underline text-sm font-medium">
+                                              {{ .Name }}
+                                          </a>
+                                      {{ end }}
+                                  </div>
+                              {{ else }}
+                                  <a href="{{ .URL }}" class="block text-brand font-bold">Vai a {{ .Name }} &rarr;</a>
+                              {{ end }}
+
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          {{ end }}
+      </div>
+
+      <div class="p-6 text-center text-xs text-gray-500 border-t border-gray-800 mt-auto">
+        &copy; {{ now.Year }} {{ .Site.Title }}. Tutti i diritti riservati.
+      </div>
+
+  </div>
 </nav>

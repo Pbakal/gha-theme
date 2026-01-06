@@ -1,0 +1,34 @@
+{{- $img := .Page.Resources.GetMatch .Destination -}} {{- if $img -}} {{-
+$optimized := $img.Resize "900x webp" -}}
+
+<figure class="my-8">
+  <img
+    src="{{ $optimized.RelPermalink }}"
+    alt="{{ .Text }}"
+    width="{{ $optimized.Width }}"
+    height="{{ $optimized.Height }}"
+    loading="lazy"
+    class="rounded-lg shadow-md w-full h-auto"
+  />
+  {{- with .Title -}}
+  <figcaption class="text-center text-sm text-gray-500 mt-2 italic">
+    {{ . }}
+  </figcaption>
+  {{- end -}}
+</figure>
+
+{{- else -}}
+<figure class="my-8">
+  <img
+    src="{{ .Destination | safeURL }}"
+    alt="{{ .Text }}"
+    loading="lazy"
+    class="rounded-lg shadow-md w-full h-auto"
+  />
+  {{- with .Title -}}
+  <figcaption class="text-center text-sm text-gray-500 mt-2 italic">
+    {{ . }}
+  </figcaption>
+  {{- end -}}
+</figure>
+{{- end -}}
