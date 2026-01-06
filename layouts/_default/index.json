@@ -1,0 +1,22 @@
+{{- $.Scratch.Add "index" slice -}}
+{{- range .Site.RegularPages -}}
+    
+    {{- /* Logica per recuperare il nome autore pulito */ -}}
+    {{- $author := "Redazione" -}}
+    {{- if .Params.authors -}}
+        {{- $author = index .Params.authors 0 -}}
+    {{- else if .Params.author -}}
+        {{- $author = .Params.author -}}
+    {{- end -}}
+
+    {{- $.Scratch.Add "index" (dict 
+        "title" .Title 
+        "date" .Date 
+        "permalink" .Permalink 
+        "summary" .Summary 
+        "section" .Section 
+        "author" $author 
+        "image" (.Params.image | default "")
+    ) -}}
+{{- end -}}
+{{- $.Scratch.Get "index" | jsonify -}}

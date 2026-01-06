@@ -20,10 +20,12 @@
 
     <main>{{ block "main" . }}{{ end }}</main>
 
-    <footer
-      class="hidden md:block py-10 bg-gray-900 text-gray-400 text-center text-sm"
-    >
-      &copy; 2024 FlashNews Media. Tutti i diritti riservati.
-    </footer>
+
+    {{/* Search Modal Partial */}}
+{{ partial "search-modal.html" . }}
+    {{/* Cookie consent partial */}}
+    {{ partial "cookie-consent.html" . }}
+
+    
   </body>
 </html>

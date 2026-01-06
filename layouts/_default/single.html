@@ -9,7 +9,7 @@
         {{ with .Params.categories }}{{ index . 0 }}{{ else }}News{{ end }}
       </span>
       <time class="text-sm text-gray-500 font-medium uppercase"
-        >{{ .Date.Format "02 Gennaio 2006" }}</time
+        >{{ .Date.Format "Jan 02, 2006" }}</time
       >
     </div>
 
@@ -19,37 +19,33 @@
       {{ .Title }}
     </h1>
 
-    <div
-      class="relative w-full aspect-video rounded-2xl overflow-hidden shadow-2xl mb-12"
-    >
-      {{/* 1. Tentativo Prioritario: Cerchiamo i nomi definiti nel TOML (es. cover, copertina) */}}
+    {{/* 1. Cerchiamo l'immagine prima di aprire qualsiasi DIV */}}
 {{ $imgResource := .Resources.GetMatch .Site.Params.images.priority_pattern }}
-
-{{/* 2. Fallback: Se non troviamo nulla col nome specifico, prendiamo la prima immagine che capita */}}
 {{ if not $imgResource }}
     {{ $imgResource = .Resources.GetMatch .Site.Params.images.fallback_pattern }}
 {{ end }}
 
-{{/* --- FINE LOGICA --- */}} {{ with
-      $imgResource }} {{ $image := .Fill "1200x675 webp center" }}
-
-      <img
-        src="{{ $image.RelPermalink }}"
-        class="w-full h-full object-cover"
+{{/* 2. Usiamo 'with': tutto ciò che è qui dentro appare SOLO se $imgResource esiste */}}
+{{ with $imgResource }}
+<div class="relative w-full aspect-video rounded-2xl overflow-hidden shadow-2xl mb-12">
+    
+    {{/* Qui siamo sicuri che l'immagine c'è, procediamo col rendering */}}
+    {{ $mobileImg := .Fill "800x1200 webp center" }}
+    {{ $desktopImg := .Fill "1200x675 webp center" }}
+    
+    <img 
+        src="{{ $desktopImg.RelPermalink }}" 
+        srcset="{{ $mobileImg.RelPermalink }} 800w, {{ $desktopImg.RelPermalink }} 1200w" 
+        sizes="(max-width: 768px) 100vw, 1200px"
         alt="{{ $.Title }}"
-        width="{{ $image.Width }}"
-        height="{{ $image.Height }}"
-        fetchpriority="high"
+        width="{{ $desktopImg.Width }}"
+        height="{{ $desktopImg.Height }}"
+        class="w-full h-full object-cover"
+        fetchpriority="high" 
         loading="eager"
-      />
-      {{ else }}
-      <div
-        class="w-full h-full bg-slate-200 flex items-center justify-center text-slate-400"
-      >
-        No Image
-      </div>
-      {{ end }}
-    </div>
+    >
+</div>
+{{ end }}
   </header>
 
   <div class="max-w-3xl mx-auto px-6">
@@ -59,28 +55,16 @@
       {{ .Content }}
     </div>
 
-    <div class="mt-16 pt-8 border-t border-gray-200">
-      <h3 class="text-sm font-bold text-gray-400 uppercase mb-4">
-        Condividi questo articolo
-      </h3>
-      <div class="flex gap-4">
-        <button
-          class="bg-[#1877F2] text-white px-4 py-2 rounded text-sm font-bold hover:opacity-90"
-        >
-          Facebook
-        </button>
-        <button
-          class="bg-[#1DA1F2] text-white px-4 py-2 rounded text-sm font-bold hover:opacity-90"
-        >
-          Twitter
-        </button>
-        <button
-          class="bg-[#25D366] text-white px-4 py-2 rounded text-sm font-bold hover:opacity-90"
-        >
-          WhatsApp
-        </button>
-      </div>
+    <div class="max-w-3xl mx-auto px-6">
+        {{ partial "share-buttons.html" . }}
+        {{ partial "author-box.html" . }}
     </div>
+    
+    {{ if eq .Type "posts" }}
+        {{ partial "related.html" . }}
+    {{ end }}
+
+    
   </div>
 </article>
 

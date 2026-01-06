@@ -1,0 +1,34 @@
+<div x-data="{ show: !localStorage.getItem('cookie_consent') }"
+     x-show="show"
+     x-transition:enter="transition ease-out duration-500"
+     x-transition:enter-start="translate-y-full opacity-0"
+     x-transition:enter-end="translate-y-0 opacity-100"
+     x-transition:leave="transition ease-in duration-300"
+     x-transition:leave-start="translate-y-0 opacity-100"
+     x-transition:leave-end="translate-y-full opacity-0"
+     class="fixed bottom-0 left-0 w-full z-50 bg-[#0f0f0f] border-t border-gray-800 shadow-2xl p-6 md:p-8"
+     style="display: none;"> <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        
+        <div class="flex-1">
+            <h3 class="text-white font-bold text-lg mb-2">We value your privacy</h3>
+            <p class="text-gray-400 text-sm leading-relaxed max-w-3xl">
+                We and our partners use cookies and similar technologies to personalize your experience and gather statistical data. 
+                By clicking "Accept All", you consent to the use of all cookies. You can read our full 
+                <a href="/privacy" class="text-brand underline hover:text-white transition-colors">Privacy Policy</a>.
+            </p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto shrink-0">
+            <button @click="localStorage.setItem('cookie_consent', 'declined'); show = false" 
+                    class="px-6 py-3 rounded-full border border-gray-600 text-gray-300 font-bold text-sm uppercase hover:bg-gray-800 hover:text-white transition-all w-full md:w-auto text-center">
+                Necessary only
+            </button>
+            
+            <button @click="localStorage.setItem('cookie_consent', 'accepted'); show = false" 
+                    class="px-8 py-3 rounded-full bg-brand text-white font-bold text-sm uppercase hover:bg-brand-dark hover:shadow-lg hover:-translate-y-0.5 transition-all w-full md:w-auto text-center shadow-brand/20 shadow-lg">
+                Accept All
+            </button>
+        </div>
+
+    </div>
+</div>

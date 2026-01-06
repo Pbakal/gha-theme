@@ -1,0 +1,114 @@
+<div x-data="searchComponent()"
+     @open-search.window="isOpen = true; $nextTick(() => $refs.searchInput.focus())"
+     x-show="isOpen"
+     style="display: none;"
+     class="fixed inset-0 z-[60] overflow-y-auto"
+     role="dialog" aria-modal="true">
+
+    <div class="fixed inset-0 bg-black/90 backdrop-blur-sm" @click="isOpen = false"></div>
+
+    <div class="relative min-h-screen md:flex md:justify-center md:pt-24 px-4">
+        
+        <div class="relative w-full max-w-2xl bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+            
+            <div class="flex items-center border-b border-gray-100 p-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input x-ref="searchInput"
+                       x-model="query"
+                       @input.debounce.300ms="performSearch()"
+                       type="text" 
+                       placeholder="Cerca notizie, autori, argomenti..." 
+                       class="w-full p-4 text-xl outline-none text-gray-800 placeholder-gray-400 font-serif">
+                
+                <button @click="isOpen = false" class="p-2 text-gray-400 hover:text-gray-600">
+                    <span class="sr-only">Chiudi</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-4 bg-gray-50" x-show="query.length > 0">
+                
+                <div x-show="isLoading" class="text-center py-8 text-gray-500">
+                    Cercando...
+                </div>
+
+                <div x-show="!isLoading && results.length === 0" class="text-center py-8 text-gray-500">
+                    Nessun risultato per "<span x-text="query" class="font-bold"></span>"
+                </div>
+
+                <div class="space-y-3">
+                    <template x-for="item in results" :key="item.permalink">
+                        <a :href="item.permalink" class="block bg-white p-4 rounded-lg shadow-sm hover:shadow-md hover:border-brand border border-transparent transition-all group">
+                            <h4 class="text-lg font-bold text-gray-900 group-hover:text-brand" x-text="item.title"></h4>
+                            <p class="text-sm text-gray-500 mt-1 line-clamp-2" x-text="item.summary"></p>
+                        </a>
+                    </template>
+                </div>
+            </div>
+            
+            <div class="bg-gray-100 p-3 text-xs text-gray-500 text-center border-t border-gray-200">
+                Premi ESC per chiudere
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
+<script>
+    function searchComponent() {
+        return {
+            isOpen: false,
+            query: '',
+            results: [],
+            isLoading: false,
+            fuse: null,
+
+            init() {
+                // Chiudi con ESC
+                this.$watch('isOpen', value => {
+                    if (value) {
+                        document.body.style.overflow = 'hidden';
+                        this.loadIndex();
+                    } else {
+                        document.body.style.overflow = '';
+                        this.query = '';
+                        this.results = [];
+                    }
+                });
+            },
+
+            async loadIndex() {
+                if (this.fuse) return; // Caricato solo una volta
+                
+                this.isLoading = true;
+                try {
+                    const response = await fetch('/index.json');
+                    const data = await response.json();
+                    
+                    this.fuse = new Fuse(data, {
+                        keys: ['title', 'summary', 'section', 'author'],
+                        threshold: 0.1, // Sensibilità (0.0 = esatto, 1.0 = a caso)
+                        ignoreLocation: true
+                    });
+                } catch (e) {
+                    console.error("Errore caricamento indice ricerca", e);
+                }
+                this.isLoading = false;
+            },
+
+            performSearch() {
+                if (!this.fuse || this.query.length < 2) {
+                    this.results = [];
+                    return;
+                }
+                // Fuse restituisce oggetti { item: ... }, noi vogliamo solo l'item
+                this.results = this.fuse.search(this.query).map(r => r.item).slice(0, 10);
+            }
+        }
+    }
+</script>

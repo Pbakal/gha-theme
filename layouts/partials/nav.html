@@ -1,4 +1,5 @@
-<nav x-data="{ isOpen: false }" @resize.window="if (window.innerWidth > 768) isOpen = false"
+<nav x-data="{ isOpen: false }" 
+     @resize.window="if (window.innerWidth > 768) isOpen = false"
      class="fixed top-0 left-0 w-full z-50 transition-all duration-300 md:bg-white/90 md:backdrop-blur-md md:border-b md:border-gray-200 md:shadow-sm">
   
   <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between relative bg-transparent z-50">
@@ -13,10 +14,20 @@
       </span>
     </a>
 
-    <div class="hidden md:flex gap-6 text-sm font-bold uppercase tracking-wide text-text-main">
-      {{ range .Site.Menus.main }}
-        <a href="{{ .URL }}" class="hover:text-brand transition-colors">{{ .Name }}</a>
-      {{ end }}
+    <div class="hidden md:flex items-center gap-6">
+        <div class="flex gap-6 text-sm font-bold uppercase tracking-wide text-text-main">
+          {{ range .Site.Menus.main }}
+            <a href="{{ .URL }}" class="hover:text-brand transition-colors">{{ .Name }}</a>
+          {{ end }}
+        </div>
+
+        <button @click="$dispatch('open-search')" 
+                class="text-text-main hover:text-brand transition-colors focus:outline-none"
+                aria-label="Cerca">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="size-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+            </svg>
+        </button>
     </div>
 
     <button @click="isOpen = !isOpen" 
@@ -25,7 +36,8 @@
       <svg x-show="!isOpen" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-8">
         <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
       </svg>
-      <svg x-show="isOpen" style="display: none;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-8 text-white"> <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      <svg x-show="isOpen" style="display: none;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-8 text-white"> 
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
       </svg>
     </button>
   </div>
@@ -37,7 +49,7 @@
        x-transition:leave="transition ease-in duration-200"
        x-transition:leave-start="translate-x-0"
        x-transition:leave-end="-translate-x-full"
-       class="md:hidden  fixed inset-0 z-40 bg-[#0f0f0f] text-white flex flex-col h-screen w-full overflow-y-auto pt-20"
+       class="md:hidden fixed inset-0 z-40 bg-[#0f0f0f] text-white flex flex-col h-screen w-full overflow-y-auto pt-20"
        style="display: none;">
 
       <div class="px-4 pb-4 border-b border-gray-800 flex justify-between items-center">
@@ -45,9 +57,9 @@
       </div>
 
       <div class="p-4 bg-[#0f0f0f]">
-          <div class="relative">
-              <input type="text" placeholder="Search the site" 
-                     class="w-full bg-white text-gray-900 px-4 py-3 pr-10 rounded-sm focus:outline-none focus:ring-2 focus:ring-brand font-sans">
+          <div class="relative" @click="$dispatch('open-search'); isOpen = false"> 
+              <input type="text" placeholder="Search the site" readonly
+                     class="w-full bg-white text-gray-900 px-4 py-3 pr-10 rounded-sm focus:outline-none focus:ring-2 focus:ring-brand font-sans pointer-events-none">
               <button class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-900">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />

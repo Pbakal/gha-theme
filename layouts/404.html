@@ -1,0 +1,44 @@
+{{ define "main" }}
+<div class="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-6 text-center">
+    
+    <div class="relative mb-8">
+        <h1 class="text-[150px] font-black text-gray-200 leading-none select-none md:text-[200px]">
+            404
+        </h1>
+        <div class="absolute inset-0 flex items-center justify-center">
+            <span class="bg-brand text-white text-xl font-bold px-4 py-2 uppercase tracking-widest shadow-lg transform -rotate-6 rounded-sm">
+                Page not found
+            </span>
+        </div>
+    </div>
+
+    <h2 class="text-3xl font-black text-gray-900 mb-4 font-serif">
+        Whoops! This story seems to have vanished.
+    </h2>
+    <p class="text-gray-500 max-w-md mx-auto mb-10 leading-relaxed">
+        The link you followed might be broken, or the page may have been removed. 
+        Head back to the homepage for the latest updates from {{ .Site.Params.city }}.
+    </p>
+
+    <div class="w-full max-w-sm mb-10 relative group">
+        <input type="text" placeholder="Search the site..." disabled 
+               class="w-full bg-white border-2 border-gray-200 text-gray-900 px-6 py-4 rounded-full focus:outline-none focus:border-brand focus:ring-4 focus:ring-brand/10 transition-all cursor-not-allowed opacity-70">
+        <button class="absolute right-3 top-1/2 -translate-y-1/2 bg-gray-100 p-2 rounded-full text-gray-400 group-focus-within:text-brand transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="size-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+            </svg>
+        </button>
+    </div>
+
+    <a href="/" class="group relative inline-flex items-center gap-3 bg-gray-900 text-white px-8 py-4 rounded-full font-bold uppercase tracking-wide hover:bg-brand transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+        <span>Back to Home</span>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 group-hover:translate-x-1 transition-transform">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+        </svg>
+    </a>
+
+</div>
+
+{{ partial "footer.html" . }}
+
+{{ end }}
