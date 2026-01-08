@@ -1,63 +1,64 @@
 <meta charset="utf-8" />
-<title>{{ .Site.Title }}</title>
-{{ partial "css.html" . }}
+
+{{/* --- 1. GESTIONE TITOLO OTTIMIZZATA --- */}}
+{{/* In Home mostra solo il nome sito, nelle altre pagine "Titolo Pagina | Nome Sito" */}}
+<title>{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} | {{ .Site.Title }}{{ end }}</title>
+
 {{ partial "schema.html" . }}
-<meta name="description" content="{{ if .IsHome }}{{ .Site.Params.description }}{{ else }}{{ .Summary }}{{ end }}">
-    <meta name="author" content="{{ .Site.Title }}">
 
-    <meta property="og:type" content="{{ if .IsPage }}article{{ else }}website{{ end }}">
-    <meta property="og:url" content="{{ .Permalink }}">
-    <meta property="og:title" content="{{ .Title }}">
-    <meta property="og:description" content="{{ if .IsHome }}{{ .Site.Params.description }}{{ else }}{{ .Summary }}{{ end }}">
-    <meta property="og:site_name" content="{{ .Site.Title }}">
+{{/* --- 2. CALCOLO UNICO DELLA DESCRIZIONE --- */}}
+{{/* Calcoliamo la descrizione UNA volta sola e la salviamo nella variabile $siteDesc */}}
+{{ $siteDesc := "" }}
 
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{{ .Title }}">
-    <meta name="twitter:description" content="{{ if .IsHome }}{{ .Site.Params.description }}{{ else }}{{ .Summary }}{{ end }}">
-
-    {{ $ogImage := "" }}
-    
-    {{/* 1. Cerchiamo l'immagine nella cartella del post */}}
-    {{ $imgResource := .Resources.GetMatch "*{jpg,jpeg,png,webp}" }}
-    
-    {{ with $imgResource }}
-        {{/* Creiamo una versione ottimizzata per i social (1200x630 è lo standard Facebook) */}}
-        {{ $socialImg := .Fill "1200x630 center" }}
-        {{ $ogImage = $socialImg.Permalink }}
-    {{ end }}
-
-    {{ if ne $ogImage "" }}
-        <meta property="og:image" content="{{ $ogImage }}">
-        <meta name="twitter:image" content="{{ $ogImage }}">
-    {{ end }}
-
-
-    {{ $siteDesc := "" }}
-
-    {{/* Caso 1: Siamo in un articolo singolo? Usa il sommario dell'articolo */}}
-    {{ if .IsPage }}
-        {{ $siteDesc = .Summary }}
-
-    {{/* Caso 2: Siamo in Home Page? */}}
+{{ if .IsPage }}
+    {{/* Se è un articolo, usa il sommario */}}
+    {{ $siteDesc = .Summary }}
+{{ else }}
+    {{/* Se è la Home o una lista */}}
+    {{ if .Site.Params.description }}
+        {{ $siteDesc = .Site.Params.description }}
     {{ else }}
-        
-        {{/* C'è una descrizione manuale nel config? */}}
-        {{ if .Site.Params.description }}
-            {{ $siteDesc = .Site.Params.description }}
-        
-        {{/* Altrimenti, costryiscila dinamicamente usando la città */}}
-        {{ else }}
-            {{/* printf ci permette di inserire variabili dentro una frase standard */}}
-            {{ $siteDesc = printf "Ultime notizie, politica e aggiornamenti sportivi da %s, %s. Leggi le news locali di %s su %s." .Site.Params.city .Site.Params.country .Site.Params.region .Site.Title }}
-        {{ end }}
-
+        {{/* Fallback dinamico se manca la descrizione nel config */}}
+        {{ $siteDesc = printf "Ultime notizie, politica e aggiornamenti sportivi da %s, %s. Leggi le news locali di %s su %s." .Site.Params.city .Site.Params.country .Site.Params.region .Site.Title }}
     {{ end }}
+{{ end }}
 
-    <meta name="description" content="{{ $siteDesc }}">
-    
-    <meta property="og:description" content="{{ $siteDesc }}">
-    <meta name="twitter:description" content="{{ $siteDesc }}">
-    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
+{{/* --- 3. META TAG (Stampati una volta sola usando la variabile) --- */}}
+<meta name="description" content="{{ $siteDesc }}">
+<meta name="author" content="{{ .Site.Title }}">
+
+{{/* Open Graph (Facebook/Social) */}}
+<meta property="og:type" content="{{ if .IsPage }}article{{ else }}website{{ end }}">
+<meta property="og:url" content="{{ .Permalink }}">
+<meta property="og:title" content="{{ .Title }}">
+<meta property="og:description" content="{{ $siteDesc }}">
+<meta property="og:site_name" content="{{ .Site.Title }}">
+
+{{/* Twitter Card */}}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ .Title }}">
+<meta name="twitter:description" content="{{ $siteDesc }}">
+
+{{/* --- 4. GESTIONE IMMAGINI SOCIAL --- */}}
+{{ $ogImage := "" }}
+
+{{/* Cerchiamo l'immagine */}}
+{{ $imgResource := .Resources.GetMatch "*{jpg,jpeg,png,webp}" }}
+
+{{ with $imgResource }}
+    {{/* Creiamo versione 1200x630 ottimizzata */}}
+    {{ $socialImg := .Fill "1200x630 center" }}
+    {{ $ogImage = $socialImg.Permalink }}
+{{ end }}
+
+{{/* Se l'abbiamo trovata, stampiamo i tag immagine */}}
+{{ if ne $ogImage "" }}
+    <meta property="og:image" content="{{ $ogImage }}">
+    <meta name="twitter:image" content="{{ $ogImage }}">
+{{ end }}
+
+{{/* --- 5. FAVICONS --- */}}
+<link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
 <link rel="manifest" href="/favicon/site.webmanifest">
