@@ -11,18 +11,22 @@
 {{ end }}
 
 {{ $avatarImg := "" }}
-{{ if and $authorPage $authorPage.Params.image }}
-    
-    {{ $resource := $authorPage.Resources.GetMatch $authorPage.Params.image }}
-    
-    {{ if $resource }}
-        {{ $avatarImg = ($resource.Fill "200x200 center webp").RelPermalink }}
-    {{ else }}
-        {{ $avatarImg = $authorPage.Params.image }}
+{{ if $authorPage }}
+    {{/* 1. CERCA AUTOMATICAMENTE UN FILE CHE INIZIA CON 'avatar' (jpg, png, ecc) */}}
+    {{ $resource := $authorPage.Resources.GetMatch "avatar*" }}
+
+    {{/* 2. Se non lo trova automatico, guarda se è specificato nel frontmatter */}}
+    {{ if not $resource }}
+        {{ if $authorPage.Params.image }}
+            {{ $resource = $authorPage.Resources.GetMatch $authorPage.Params.image }}
+        {{ end }}
     {{ end }}
 
+    {{/* 3. Se abbiamo trovato l'immagine, la ridimensioniamo */}}
+    {{ if $resource }}
+        {{ $avatarImg = ($resource.Fill "200x200 center webp").RelPermalink }}
+    {{ end }}
 {{ end }}
-
 <div class="flex items-center gap-4 p-6 bg-gray-50 border border-gray-100 rounded-xl mt-8">
     
     <div class="shrink-0 w-16 h-16 rounded-full bg-white border-2 border-brand/20 overflow-hidden shadow-sm">
