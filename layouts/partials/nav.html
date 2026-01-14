@@ -1,15 +1,16 @@
 <nav x-data="{ isOpen: false }" 
      @resize.window="if (window.innerWidth > 768) isOpen = false"
-     class="fixed top-0 left-0 w-full z-50 transition-all duration-300 md:bg-white/90 md:backdrop-blur-md md:border-b md:border-gray-200 md:shadow-sm">
+     class="fixed top-0 left-0 w-full z-50 transition-all duration-300 bg-brand shadow-sm md:bg-white/90 md:backdrop-blur-md md:border-b md:border-gray-200">
   
-  <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between relative bg-transparent z-50">
+  <div class="max-w-6xl mx-auto bg-brand md:bg-white px-6 h-16 flex items-center justify-between relative z-50">
     
-    <a href="/" class="text-2xl font-black tracking-tighter uppercase transition-colors duration-300
-        {{ if .IsHome }} text-white drop-shadow-md {{ else }} text-brand {{ end }}
-        md:text-brand md:drop-shadow-none">
+    <a href="/" class="flex items-center gap-1 text-2xl font-black tracking-tighter uppercase transition-colors duration-300">
       
-      {{ .Site.Params.city }}
-      <span class="{{ if .IsHome }} text-brand {{ else }} text-text-main {{ end }} md:text-text-main">
+      <span class="bg-brand text-white  px-2 py-0.5 md:bg-white md:text-brand">
+        {{ .Site.Params.city }}
+      </span>
+
+      <span class="text-black">
         today
       </span>
     </a>
@@ -31,7 +32,7 @@
     </div>
 
     <button @click="isOpen = !isOpen" 
-            class="md:hidden cursor-pointer {{ if .IsHome }} text-white drop-shadow-md {{ else }} text-text-main {{ end }} focus:outline-none"
+            class="md:hidden cursor-pointer text-gray-900 hover:text-brand focus:outline-none"
             aria-label="Toggle Menu">
       <svg x-show="!isOpen" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-8">
         <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
@@ -70,7 +71,7 @@
 
       <div class="flex-1">
           {{ range .Site.Menus.mobile }}
-              
+            
               <div x-data="{ expanded: {{ if eq .Identifier "news" }}true{{ else }}false{{ end }} }" 
                    class="border-b border-gray-800">
 
