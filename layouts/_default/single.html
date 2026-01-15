@@ -2,69 +2,75 @@
 
 <article class="pt-24 pb-20">
   <header class="max-w-4xl mx-auto px-6 mb-12 text-center">
+    
     <div class="flex items-center justify-center gap-4 mb-6">
-      <span
-        class="px-3 py-1 text-xs font-bold uppercase tracking-widest text-brand bg-red-100 rounded-full"
-      >
+      <span class="px-3 py-1 text-xs font-bold uppercase tracking-widest text-brand bg-red-100 rounded-full">
         {{ with .Params.categories }}{{ index . 0 }}{{ else }}News{{ end }}
       </span>
-      <time class="text-sm text-gray-500 font-medium uppercase"
-        >{{ .Date.Format "Jan 02, 2006" }}</time
-      >
+      <time class="text-sm text-gray-500 font-medium uppercase">
+        {{ .Date.Format "Jan 02, 2006" }}
+      </time>
     </div>
 
-    <h1
-      class="text-4xl md:text-5xl lg:text-6xl font-black text-text-main leading-tight mb-8"
-    >
+    <h1 class="text-4xl md:text-5xl lg:text-6xl font-black text-text-main leading-tight mb-8">
       {{ .Title }}
     </h1>
 
-    {{/* 1. Cerchiamo l'immagine prima di aprire qualsiasi DIV */}}
-{{ $imgResource := .Resources.GetMatch .Site.Params.images.priority_pattern }}
-{{ if not $imgResource }}
-    {{ $imgResource = .Resources.GetMatch .Site.Params.images.fallback_pattern }}
-{{ end }}
+    {{/* --- LOGICA IMMAGINE DI COPERTINA --- */}}
+    {{/* 1. Troviamo l'immagine */}}
+    {{ $imgResource := .Resources.GetMatch .Site.Params.images.priority_pattern }}
+    {{ if not $imgResource }}
+      {{ $imgResource = .Resources.GetMatch .Site.Params.images.fallback_pattern }}
+    {{ end }}
 
-{{/* 2. Usiamo 'with': tutto ciò che è qui dentro appare SOLO se $imgResource esiste */}}
-{{ with $imgResource }}
-<div class="relative w-full aspect-video rounded-2xl overflow-hidden shadow-2xl mb-12">
+    {{/* 2. Rendering Ottimizzato */}}
+    {{ with $imgResource }}
     
-    {{/* Qui siamo sicuri che l'immagine c'è, procediamo col rendering */}}
-    {{ $mobileImg := .Fill "800x1200 webp center" }}
-    {{ $desktopImg := .Fill "1200x675 webp center" }}
-    
-    <img 
-        src="{{ $desktopImg.RelPermalink }}" 
-        srcset="{{ $mobileImg.RelPermalink }} 800w, {{ $desktopImg.RelPermalink }} 1200w" 
-        sizes="(max-width: 768px) 100vw, 1200px"
+    <div class="relative w-full aspect-video rounded-2xl overflow-hidden shadow-2xl mb-12 bg-gray-100">
+      
+      {{/* Generiamo 3 versioni WebP mantenendo il rapporto 16:9 (Fill).
+         Uso "smart" per cercare di centrare i volti se Hugo deve ritagliare.
+      */}}
+      {{ $small := .Fill "640x360 webp q85 smart" }}
+      {{ $medium := .Fill "1024x576 webp q85 smart" }}
+      {{ $large := .Fill "1600x900 webp q85 smart" }}
+      
+      <img 
+        src="{{ $large.RelPermalink }}" 
+        srcset="
+          {{ $small.RelPermalink }} 640w, 
+          {{ $medium.RelPermalink }} 1024w,
+          {{ $large.RelPermalink }} 1600w" 
+        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 1200px"
         alt="{{ $.Title }}"
-        width="{{ $desktopImg.Width }}"
-        height="{{ $desktopImg.Height }}"
+        width="{{ $large.Width }}"
+        height="{{ $large.Height }}"
         class="w-full h-full object-cover"
         fetchpriority="high" 
         loading="eager"
-    >
-</div>
-{{ end }}
+        decoding="async"
+      >
+    </div>
+    {{ end }}
+    
   </header>
 
   <div class="max-w-3xl mx-auto px-6">
-    <div
-      class="prose prose-lg prose-slate mx-auto text-text-body first-letter:text-5xl first-letter:font-bold first-letter:text-brand first-letter:mr-3 first-letter:float-left"
-    >
+    <div class="prose prose-lg prose-slate mx-auto text-text-body first-letter:text-5xl first-letter:font-bold first-letter:text-brand first-letter:mr-3 first-letter:float-left">
       {{ .Content }}
     </div>
 
-    <div class="max-w-3xl mx-auto px-6">
+    <div class="max-w-3xl mx-auto mt-12">
         {{ partial "share-buttons.html" . }}
         {{ partial "author-box.html" . }}
     </div>
     
     {{ if eq .Type "posts" }}
-        {{ partial "related.html" . }}
+        <div class="mt-12">
+           {{ partial "related.html" . }}
+        </div>
     {{ end }}
 
-    
   </div>
 </article>
 

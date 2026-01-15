@@ -1,34 +1,51 @@
-{{- $img := .Page.Resources.GetMatch .Destination -}} {{- if $img -}} {{-
-$optimized := $img.Resize "900x webp" -}}
+{{- $img := .Page.Resources.GetMatch .Destination -}} 
 
-<figure class="my-8">
-  <img
-    src="{{ $optimized.RelPermalink }}"
-    alt="{{ .Text }}"
-    width="{{ $optimized.Width }}"
-    height="{{ $optimized.Height }}"
-    loading="lazy"
-    class="rounded-lg shadow-md w-full h-auto"
-  />
-  {{- with .Title -}}
-  <figcaption class="text-center text-sm text-gray-500 mt-2 italic">
-    {{ . }}
-  </figcaption>
-  {{- end -}}
-</figure>
+{{- if $img -}}
+  {{/* --- 1. GENERAZIONE VARIANTI --- */}}
+  {{/* Creiamo 3 versioni: Piccola (mobile), Media (tablet), Grande (desktop) */}}
+  {{/* "q80" imposta la qualità all'80%, ottimo compromesso peso/bellezza */}}
+  {{- $small := $img.Resize "480x webp q80" -}}
+  {{- $medium := $img.Resize "800x webp q80" -}}
+  {{- $large := $img.Resize "1200x webp q80" -}}
+
+  <figure class="my-8">
+    <img
+      loading="lazy"
+      decoding="async"
+      src="{{ $medium.RelPermalink }}" 
+      srcset="
+        {{ $small.RelPermalink }} 480w,
+        {{ $medium.RelPermalink }} 800w,
+        {{ $large.RelPermalink }} 1200w"
+      sizes="(max-width: 480px) 100vw, (max-width: 800px) 90vw, 800px"
+      alt="{{ .Text }}"
+      width="{{ $img.Width }}"
+      height="{{ $img.Height }}"
+      class="rounded-lg shadow-md w-full h-auto"
+    />
+    
+    {{- with .Title -}}
+      <figcaption class="text-center text-sm text-gray-500 mt-2 italic">
+        {{ . }}
+      </figcaption>
+    {{- end -}}
+  </figure>
 
 {{- else -}}
-<figure class="my-8">
-  <img
-    src="{{ .Destination | safeURL }}"
-    alt="{{ .Text }}"
-    loading="lazy"
-    class="rounded-lg shadow-md w-full h-auto"
-  />
-  {{- with .Title -}}
-  <figcaption class="text-center text-sm text-gray-500 mt-2 italic">
-    {{ . }}
-  </figcaption>
-  {{- end -}}
-</figure>
+  {{/* --- FALLBACK PER IMMAGINI ESTERNE (Link https://...) --- */}}
+  {{/* Non possiamo ridimensionare immagini che non sono sul nostro server */}}
+  <figure class="my-8">
+    <img
+      src="{{ .Destination | safeURL }}"
+      alt="{{ .Text }}"
+      loading="lazy"
+      decoding="async"
+      class="rounded-lg shadow-md w-full h-auto"
+    />
+    {{- with .Title -}}
+    <figcaption class="text-center text-sm text-gray-500 mt-2 italic">
+      {{ . }}
+    </figcaption>
+    {{- end -}}
+  </figure>
 {{- end -}}
