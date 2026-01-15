@@ -57,12 +57,18 @@
     <meta name="twitter:image" content="{{ $ogImage }}">
 {{ end }}
 
-{{/* --- 5. FAVICONS --- */}}
+{{/* --- 5. FAVICONS & THEME COLOR --- */}}
 <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
-<link rel="manifest" href="/favicon/site.webmanifest">
-<link rel="shortcut icon" href="/favicon/favicon.ico">
-<meta name="theme-color" content="{{ .Site.Params.themeColor }}">
-<meta name="msapplication-TileColor" content="{{ .Site.Params.themeColor }}">
 
+{{/* Aggiungo la query string ?v=2 per forzare l'aggiornamento del manifest */}}
+<link rel="manifest" href="/favicon/site.webmanifest?v=2">
+<link rel="shortcut icon" href="/favicon/favicon.ico">
+
+{{/* Qui sta la correzione principale: leggo la variabile e metto un fallback di sicurezza */}}
+<meta name="theme-color" content="{{ .Site.Params.themeColor | default "#e11d48" }}">
+<meta name="msapplication-TileColor" content="{{ .Site.Params.themeColor | default "#e11d48" }}">
+
+{{/* Questo è utile per la barra di stato su iPhone */}}
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
