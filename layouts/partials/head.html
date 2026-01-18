@@ -63,9 +63,9 @@
 
 {{/* C. Fallback Globale (Per la Home o se l'articolo non ha foto) */}}
 {{ if eq $ogImage "" }}
-    {{/* Se non c'è nessuna foto, usa il logo o un'immagine di default (opzionale) */}}
-    {{/* Assicurati che esista static/images/default-social.jpg se vuoi usarlo */}}
-    {{ $ogImage = absURL "/images/logo-accra.png" }} 
+    {{/* Invece del logo che non c'è, usiamo l'icona Android grande (512x512) */}}
+    {{/* È quadrata, ma per ora va benissimo come riempitivo */}}
+    {{ $ogImage = absURL "/favicon/android-chrome-512x512.png" }} 
 {{ end }}
 
 {{/* D. Stampiamo finalmente i tag immagine */}}
