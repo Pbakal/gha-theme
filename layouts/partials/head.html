@@ -63,9 +63,8 @@
 
 {{/* C. Fallback Globale (Per la Home o se l'articolo non ha foto) */}}
 {{ if eq $ogImage "" }}
-    {{/* Invece del logo che non c'è, usiamo l'icona Android grande (512x512) */}}
-    {{/* È quadrata, ma per ora va benissimo come riempitivo */}}
-    {{ $ogImage = absURL "/favicon/android-chrome-512x512.png" }} 
+    {{/* USIAMO IL NUOVO LOGO UFFICIALE! */}}
+    {{ $ogImage = absURL "/images/social-cover.jpg" }} 
 {{ end }}
 
 {{/* D. Stampiamo finalmente i tag immagine */}}
