@@ -64,8 +64,8 @@
 {{/* C. Fallback Globale (Per la Home o se l'articolo non ha foto) */}}
 {{ if eq $ogImage "" }}
     {{/* USIAMO IL NUOVO LOGO UFFICIALE! */}}
-    {{ $ogImage = absURL "/images/social-cover.jpg" }} 
-{{ end }}
+    {{ $ogImage = absURL "/images/social-cover.png" }} 
+{{ end }}   
 
 {{/* D. Stampiamo finalmente i tag immagine */}}
 <meta property="og:image" content="{{ $ogImage }}">
